@@ -1,7 +1,12 @@
 #include <gtk/gtk.h>
 #include "ui/mainwindow.h"
 #include "ui/drives.h"
+#include "drives.h"
 #include "ui/formats.h"
+#include <stdio.h>
+
+/** The list of CD Drive Information */
+static CDList cdList;
 
 /**
  * The main entry point of the Tear application. 
@@ -17,7 +22,13 @@ int tear_main(int argc, char** argv, char** argp) {
     ui_formats_register(2, "FLAC");
     ui_formats_register(3, "WAV");
 
-    ui_drives_register(0, "HL-DT-ST DVD+-RW GT10N        Rev: A104");
+    cdList = cd_list_new();
+    int i;
+    for (i = 0; i < cd_list_size(cdList); ++i) {
+        const char * name = cd_list_get_name(cdList, i);
+        ui_drives_register(i, name);
+        printf("Found CD Drive %d: %s\n", i, name);
+    }
 
     ui_create_main_window();
     ui_show_main_window(true);
