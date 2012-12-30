@@ -1,5 +1,13 @@
-#include <stdio.h>
+#include <gtk/gtk.h>
 
-int test() {
-    printf("Testing\n");
+int test(int argc, char* argv[]) {
+    GtkWidget* window;
+    gtk_init(&argc, &argv);
+
+    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_widget_show(window);
+
+    gtk_main();
+
+    return 0;
 }
