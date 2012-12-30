@@ -7,6 +7,8 @@ SET (Tear_VERSION_MAJOR 0)
 SET (Tear_VERSION_MINOR 0)
 SET (Tear_VERSION_MICRO 1)
 
+SET(CMAKE_C_FLAGS "-std=c99 -Wall -Werror")
+
 CONFIGURE_FILE (
     "${PROJECT_SOURCE_DIR}/includes/config.h.in"
     "${PROJECT_BINARY_DIR}/includes/config.h"
