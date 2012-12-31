@@ -12,6 +12,12 @@ typedef struct Config_t* Config;
 Config config_load(const char * file);
 
 /**
+ * Create a new, blank Config object
+ * @return the blank Config object
+ */
+Config config_new();
+
+/**
  * Free the configuration object provided
  * @param config The config object to free
  */

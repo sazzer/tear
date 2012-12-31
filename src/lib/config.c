@@ -1,4 +1,5 @@
 #include <string.h>
+#include <ctype.h>
 #include "config.h"
 #include <stdlib.h>
 #include <sys/types.h>
@@ -20,6 +21,16 @@ struct Config_t {
 };
 
 /**
+ * Create a new, blank Config object
+ * @return the blank Config object
+ */
+Config config_new() {
+    Config result = malloc(sizeof(struct Config_t));
+    result->values = g_hash_table_new_full(g_str_hash, g_str_equal, free, free);
+    return result;
+}
+
+/**
  * Load the configuration from the given Config file
  * @param file The filename to load the config from
  * @return the loaded Config, or NULL if the file couldn't be loaded
@@ -30,8 +41,7 @@ Config config_load(const char * file) {
     char lineBuffer[1024];
 
     if (fb != NULL) {
-        result = malloc(sizeof(struct Config_t));
-        result->values = g_hash_table_new_full(g_str_hash, g_str_equal, free, free);
+        result = config_new();
 
         while (fgets(lineBuffer, 1024, fb) != NULL) {
             lineBuffer[strlen(lineBuffer) - 1] = 0;
