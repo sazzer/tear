@@ -11,7 +11,7 @@ mkdir $BUILDDIR
 
 pushd $BUILDDIR
 
-cmake -DCMAKE_INSTALL_PREFIX=$INSTALLDIR -Wno-dev --warn-uninitialized --warn-unused-vars  $@ $TOPDIR || exit 1
+cmake -DCMAKE_INSTALL_PREFIX=$INSTALLDIR -DCMAKE_BUILD_TYPE=Debug -Wno-dev --warn-uninitialized --warn-unused-vars  $@ $TOPDIR || exit 1
 make || exit 2
 #make test || exit 3
 make install || exit 4

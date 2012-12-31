@@ -20,6 +20,8 @@ struct CDInfo_t {
     char * name;
 };
 
+typedef struct CDInfo_t* CDInfo;
+
 /** Representation of a list of CD Drives */
 struct CDList_t {
     /** The actual list */
@@ -30,7 +32,7 @@ struct CDList_t {
  * Generate a list of all the CD Drives that can be used
  * @return the list of CD Drives
  */
-CDList cd_list_new() {
+CDList drive_list_new() {
     CDList list = malloc(sizeof(struct CDList_t));
     list->list = g_slist_alloc();
 
@@ -58,13 +60,26 @@ CDList cd_list_new() {
 }
 
 /**
- * Free up the list of CD drives
- * @param list The list to free
+ * Destroy function used to free the data from a single entry in the CD List
+ * @param data Pointer to the data in the list
  */
-void cd_list_free(CDList list) {
-    if (list) {
-        g_slist_free(list->list);
-        free(list);
+static void CDList_destroy_function(gpointer data) {
+    if (data) {
+        CDInfo info = data;
+        free(info->name);
+        free(info);
+    }
+}
+
+/**
+ * Free up the list of CD Drives
+ * @param list The list of drives to free
+ */
+void drive_list_free(CDList* list) {
+    if (list && *list) {
+        g_slist_free_full((*list)->list, CDList_destroy_function);
+        free(*list);
+        *list = 0;
     }
 }
 
@@ -73,7 +88,7 @@ void cd_list_free(CDList list) {
  * @param list The list to query
  * @return the size of the list
  */
-int cd_list_size(const CDList list) {
+int drive_list_size(const CDList list) {
     int result = 0;
     if (list) {
         result = g_slist_length(list->list) - 1;
@@ -87,7 +102,7 @@ int cd_list_size(const CDList list) {
  * @param index The index of the entry to get
  * @return the name of this entry. If the entry doesn't exist then null is returned
  */
-const char * cd_list_get_name(const CDList list, const int index) {
+const char * drive_list_get_name(const CDList list, const int index) {
     const char * name = 0;
     if (list) {
         if (g_slist_length(list->list) > index && index >= 0) {

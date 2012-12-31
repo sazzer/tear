@@ -22,10 +22,10 @@ int tear_main(int argc, char** argv, char** argp) {
     ui_formats_register(2, "FLAC");
     ui_formats_register(3, "WAV");
 
-    cdList = cd_list_new();
+    cdList = drive_list_new();
     int i;
-    for (i = 0; i < cd_list_size(cdList); ++i) {
-        const char * name = cd_list_get_name(cdList, i);
+    for (i = 0; i < drive_list_size(cdList); ++i) {
+        const char * name = drive_list_get_name(cdList, i);
         ui_drives_register(i, name);
         printf("Found CD Drive %d: %s\n", i, name);
     }
@@ -34,5 +34,7 @@ int tear_main(int argc, char** argv, char** argp) {
     ui_show_main_window(true);
 
     gtk_main();
+
+    drive_list_free(&cdList);
     return 0;
 }
