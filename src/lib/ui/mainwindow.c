@@ -20,7 +20,7 @@ static GtkWidget* grid;
 /**
  * Actually create and configure the main window
  */
-void createMainWindow() {
+static void createMainWindow() {
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), _("Tear"));
     gtk_window_set_default_size(GTK_WINDOW(window), 230, 150);
@@ -34,7 +34,7 @@ void createMainWindow() {
  * Actually create and configure the grid that contains the widgets in
  * the main window
  */
-void createGrid() {
+static void createGrid() {
     grid = gtk_grid_new();
     gtk_grid_insert_column(GTK_GRID(grid), 0);
     gtk_grid_insert_column(GTK_GRID(grid), 1);
@@ -49,7 +49,7 @@ void createGrid() {
  * @param label The text of the label
  * @return the widget that was created for the label
  */
-GtkWidget* createLabelledRow(int row, const char* label) {
+static GtkWidget* createLabelledRow(int row, const char* label) {
     GtkWidget* labelWidget;
     gtk_grid_insert_row(GTK_GRID(grid), row);
 
@@ -65,7 +65,7 @@ static GtkWidget* authorEntry;
 /**
  * Create the author row
  */
-void createAuthorRow() {
+static void createAuthorRow() {
     createLabelledRow(AUTHOR_ROW, _("Author"));
 
     authorEntry = gtk_entry_new();
@@ -79,7 +79,7 @@ static GtkWidget* titleEntry;
 /**
  * Create the title row
  */
-void createTitleRow() {
+static void createTitleRow() {
     createLabelledRow(TITLE_ROW, _("Title"));
 
     titleEntry = gtk_entry_new();
@@ -93,7 +93,7 @@ static GtkWidget* discEntry;
 /**
  * Create the disc row
  */
-void createDiscRow() {
+static void createDiscRow() {
     createLabelledRow(DISC_ROW, _("Disc"));
 
     discEntry = gtk_spin_button_new_with_range(0, 100, 1);
@@ -109,7 +109,7 @@ static GtkWidget* formatEntry;
 /**
  * Create the format row
  */
-void createFormatRow() {
+static void createFormatRow() {
     createLabelledRow(FORMAT_ROW, _("Format"));
 
     formatEntry = gtk_combo_box_new_with_model(ui_formats_get_model());
@@ -129,7 +129,7 @@ static GtkWidget* driveEntry;
 /**
  * Create the drive row
  */
-void createDriveRow() {
+static void createDriveRow() {
     createLabelledRow(DRIVE_ROW, _("Drive"));
 
     driveEntry = gtk_combo_box_new_with_model(ui_drives_get_model());
@@ -148,7 +148,7 @@ static GtkWidget* goButton;
 /**
  * Create the buttons row
  */
-void createButtonsRow() {
+static void createButtonsRow() {
     GtkWidget* buttonsBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
 
     gtk_grid_insert_row(GTK_GRID(grid), BUTTONS_ROW);

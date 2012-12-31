@@ -32,4 +32,12 @@ void config_free(Config* config);
  */
 const char * config_get_string(Config config, const char * name);
 
+/**
+ * Set a new value into the Config object, overwriting an existing one if it's already present
+ * @param config The config object to request
+ * @param name The name of the setting to set
+ * @param value The new value
+ */
+void config_set_string(Config config, const char * name, const char * value);
+
 #endif // CONFIG_H
