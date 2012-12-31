@@ -1,0 +1,1 @@
+static const char * SOURCE_DIR = "@PROJECT_SOURCE_DIR@";
