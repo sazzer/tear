@@ -19,10 +19,10 @@ module Tear
                 @dialog.vbox.add @grid
 
                 @baseDirEntry = Gtk::FileChooserButton.new "Select base directory", Gtk::FileChooser::ACTION_SELECT_FOLDER
-                addLabelledWidget("Base Dir", @baseDirEntry, 0);
+                addLabelledWidget("Base Dir", @baseDirEntry, 0)
 
                 @filenameEntry = Gtk::Entry.new
-                addLabelledWidget("Filename", @filenameEntry, 1);
+                addLabelledWidget("Filename", @filenameEntry, 1)
 
                 @dialog.signal_connect("response") { |dialog, response|
                     if response == Gtk::Dialog::RESPONSE_OK
