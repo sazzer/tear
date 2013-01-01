@@ -12,6 +12,8 @@ Gem::Specification.new do |s|
     s.email = "graham@grahamcox.co.uk"
     s.homepage = "http://grahamcox.co.uk/tear"
 
+    s.add_dependency "gtk2"
+
     s.add_development_dependency "rdoc"
     s.add_development_dependency "sdoc"
     s.add_development_dependency "rake"
