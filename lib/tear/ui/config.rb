@@ -5,7 +5,8 @@ module Tear
     module UI
         # Wrapper around the configuration dialog
         class Config
-            def initialize
+            def initialize(config)
+                @config = config
                 @dialog = Gtk::Dialog.new "Tear - Config", 
                     nil, 
                     nil, 
@@ -31,8 +32,14 @@ module Tear
                 }
             end
 
+            def populate
+                @baseDirEntry.set_text @config.baseDir
+                @filenameEntry.set_text @config.filename
+            end
+
             # Show the dialog
             def show
+                populate
                 @dialog.show_all
             end
 

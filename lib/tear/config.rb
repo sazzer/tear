@@ -13,8 +13,14 @@ module Tear
                 @baseDir = config['baseDir']
             else
                 @loaded = false
+            end
+
+            if @filename.nil?
                 @filename = "%a/%t/%d.%e"
-                @baseDir = "/home/graham/Audiobooks"
+            end
+
+            if @baseDir.nil?
+                @baseDir = File.expand_path("~/Audiobooks")
             end
         end
     end
