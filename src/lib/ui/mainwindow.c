@@ -1,4 +1,5 @@
 #include <gtk/gtk.h>
+#include <string.h>
 #include "intl.h"
 #include "mainwindow.h"
 #include "formats.h"
@@ -13,6 +14,9 @@ static const int BUTTONS_ROW = 5;
 
 /** The config callback to use */
 static ConfigCallback configCallback;
+
+/** The go callback to use */
+static GoCallback goCallback;
 
 /** The actual main window of the application */
 static GtkWidget* window;
@@ -146,9 +150,29 @@ static void createDriveRow() {
     gtk_combo_box_set_active(GTK_COMBO_BOX(driveEntry), 0);
 }
 
+/**
+ * Handler when the Config button is pressed
+ */
 static void onConfig() {
     if (configCallback) {
         configCallback();
+    }
+}
+
+/**
+ * Handler when the Go button is pressed
+ */
+static void onGo() {
+    int driveIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(driveEntry));
+    int drive = ui_drives_get_id_from_index(driveIndex);
+    const char * author = gtk_entry_get_text(GTK_ENTRY(authorEntry));
+    const char * title = gtk_entry_get_text(GTK_ENTRY(titleEntry));
+    int disc = gtk_spin_button_get_value(GTK_SPIN_BUTTON(discEntry));
+    int formatIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(formatEntry));
+    int format = ui_formats_get_id_from_index(formatIndex);
+
+    if (strlen(author) > 0 && strlen(title) > 0 && goCallback) {
+        goCallback(drive, author, title, disc, format);
     }
 }
 
@@ -173,14 +197,17 @@ static void createButtonsRow() {
 
     goButton = gtk_button_new_with_label(_("Go"));
     gtk_container_add(GTK_CONTAINER(buttonsBox), goButton);
+    g_signal_connect_swapped(G_OBJECT(goButton), "clicked", G_CALLBACK(onGo), NULL);
 }
 
 /**
  * Actually create the main window of the application
  * @param cc callback to trigger when the Config button is pressed
+ * @param gc callback to trigger when the Go button is pressed
  */
-void ui_create_main_window(ConfigCallback cc) {
+void ui_create_main_window(ConfigCallback cc, GoCallback gc) {
     configCallback = cc;
+    goCallback = gc;
 
     createMainWindow();
     createGrid();

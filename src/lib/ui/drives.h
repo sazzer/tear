@@ -16,4 +16,11 @@ void ui_drives_register(int id, const char* label);
  */
 GtkTreeModel* ui_drives_get_model();
 
+/**
+ * Get the ID of the drive entry at the given index
+ * @param index The index
+ * @retrn the ID
+ */
+int ui_drives_get_id_from_index(int index);
+
 #endif // UI_DRIVES_H

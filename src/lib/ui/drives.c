@@ -31,3 +31,17 @@ GtkTreeModel* ui_drives_get_model() {
     }
     return GTK_TREE_MODEL(drivesStore);
 }
+
+/**
+ * Get the ID of the entry at the given index
+ * @param index The index
+ * @retrn the ID
+ */
+int ui_drives_get_id_from_index(int index) {
+    int id;
+    GtkTreeIter iter;
+    GtkTreeModel* drives = ui_drives_get_model();
+    gtk_tree_model_iter_nth_child(drives, &iter, NULL, index);
+    gtk_tree_model_get(drives, &iter, ID_COLUMN, &id, -1);
+    return id;
+}

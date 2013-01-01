@@ -82,6 +82,19 @@ void onConfigClicked() {
 }
 
 /**
+ * Handler when the Go button is pressed on the main window
+ * @param drive The index of the Drive selected
+ * @param author The author entered
+ * @param title The title entered
+ * @param disc The disc entered
+ * @param format The index of the format selected
+ */
+void onGoClicked(const int drive, const char* author, const char* title, const int disc, const int format) {
+    g_log(NULL, G_LOG_LEVEL_INFO, "Ripping from drive %d, with title %s, author %s, disc %d to format %d", 
+        drive, title, author, disc, format);
+}
+
+/**
  * The main entry point of the Tear application. 
  * @param argc The number of entries in the argv array
  * @param argv The arguments array
@@ -112,7 +125,7 @@ int tear_main(int argc, char** argv, char** argp) {
         printf("Found CD Drive %d: %s\n", i, name);
     }
 
-    ui_create_main_window(onConfigClicked);
+    ui_create_main_window(onConfigClicked, onGoClicked);
     ui_create_config_window(config, onConfigSave, onConfigCancel);
 
     showInitialWindow();

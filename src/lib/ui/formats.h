@@ -16,4 +16,11 @@ void ui_formats_register(int id, const char* label);
  */
 GtkTreeModel* ui_formats_get_model();
 
+/**
+ * Get the ID of the format entry at the given index
+ * @param index The index
+ * @retrn the ID
+ */
+int ui_formats_get_id_from_index(int index);
+
 #endif // UI_FORMATS_H
