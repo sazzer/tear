@@ -1,4 +1,5 @@
 require "yaml"
+require "yaml/store"
 
 module Tear
     class Config
@@ -22,6 +23,15 @@ module Tear
             if @baseDir.nil?
                 @baseDir = File.expand_path("~/Audiobooks")
             end
+        end
+
+        def save
+            store = YAML::Store.new @configFile
+            store.transaction do
+                store["filename"] = @filename
+                store["baseDir"] = @baseDir
+            end
+            @loaded = true
         end
     end
 end

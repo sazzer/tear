@@ -12,6 +12,15 @@ module Tear
 
             Gtk.init
             @configWindow = Tear::UI::Config.new config
+            @configWindow.events.listen(:save) do 
+                config.save
+            end
+            @configWindow.events.listen(:cancel) do
+                if !config.loaded
+                    @configWindow.show
+                end
+            end
+
             @configWindow.show
             Gtk.main
         end

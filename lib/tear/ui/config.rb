@@ -1,4 +1,5 @@
 require "gtk2"
+require "ruby_events"
 require "tear/logger"
 
 module Tear 
@@ -17,7 +18,7 @@ module Tear
                 @grid = Gtk::Table.new(3, 2)
                 @dialog.vbox.add @grid
 
-                @baseDirEntry = Gtk::Entry.new
+                @baseDirEntry = Gtk::FileChooserButton.new "Select base directory", Gtk::FileChooser::ACTION_SELECT_FOLDER
                 addLabelledWidget("Base Dir", @baseDirEntry, 0);
 
                 @filenameEntry = Gtk::Entry.new
@@ -33,7 +34,7 @@ module Tear
             end
 
             def populate
-                @baseDirEntry.set_text @config.baseDir
+                @baseDirEntry.set_current_folder @config.baseDir
                 @filenameEntry.set_text @config.filename
             end
 
@@ -47,11 +48,17 @@ module Tear
             # Handle when the Save button is pressed
             def onSave
                 $log.info "Saving config changes"
+                @config.baseDir = @baseDirEntry.current_folder
+                @config.filename = @filenameEntry.text
+                @dialog.hide
+                events.fire(:save)
             end
 
             # Handle when the Cancel button is pressed
             def onCancel
                 $log.info "Cancelling config changes"
+                @dialog.hide
+                events.fire(:cancel)
             end
 
             # Helper to add a labelled widget to the dialog

@@ -13,6 +13,7 @@ Gem::Specification.new do |s|
     s.homepage = "http://grahamcox.co.uk/tear"
 
     s.add_dependency "gtk2"
+    s.add_dependency "ruby_events"
 
     s.add_development_dependency "rdoc"
     s.add_development_dependency "sdoc"
