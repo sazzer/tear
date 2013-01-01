@@ -1,3 +1,5 @@
+require "tear/cdrdao/scanbus"
+
 module Tear
     class Drive
         attr_accessor :name, :drive
@@ -10,7 +12,12 @@ module Tear
 
     module Drives
         def self.drives
-            [Drive.new("HL-DT-ST DVD+-RW GT10N : A104", "/dev/sr0")]
+            scanbus = Tear::Cdrdao::ScanBus.new
+            result = []
+            scanbus.entries.each { |entry|
+                result.push Drive.new(entry.name, entry.drive)
+            }
+            result
         end
     end
 end
