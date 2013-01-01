@@ -13,6 +13,10 @@ static GtkWidget* window;
 static GtkWidget* grid;
 /** The config object to use */
 static Config tearConfig;
+/** The callback when the config is saved */
+static SaveCallback saveCallback;
+/** The callback when the config is cancelled */
+static CancelCallback cancelCallback;
 
 /**
  * Actually create and configure the config window
@@ -23,6 +27,7 @@ static void createConfigWindow() {
     gtk_window_set_default_size(GTK_WINDOW(window), 230, 150);
     gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
     gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
+    gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
 }
 
 /**
@@ -107,16 +112,45 @@ static void createButtonsRow() {
 }
 
 /**
+ * Handle when the Save button is triggered
+ */
+static void onSave() {
+    if (saveCallback) {
+        saveCallback();
+    }
+}
+
+/**
+ * Handle when the Cancel button is triggered
+ */
+static void onCancel() {
+    if (cancelCallback) {
+        cancelCallback();
+    }
+}
+
+/**
+ * Register callbacks on all of the widgets
+ */
+static void registerCallbacks() {
+    g_signal_connect_swapped(G_OBJECT(window), "destroy", G_CALLBACK(onCancel), NULL);
+    g_signal_connect_swapped(G_OBJECT(cancelButton), "clicked", G_CALLBACK(onCancel), NULL);
+    g_signal_connect_swapped(G_OBJECT(saveButton), "clicked", G_CALLBACK(onSave), NULL);
+}
+
+/**
  * Repopulate the config dialog based on the values in the config object
  */
 static void repopulateDialog() {
     const char * baseDir = config_get_string(tearConfig, BASE_DIR_SETTING);
     if (baseDir) {
+        printf("Setting base dir to: %s\n", baseDir);
         gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(baseDirEntry), baseDir);
     }
 
     const char * outputFormat = config_get_string(tearConfig, FILENAME_SETTING);
     if (outputFormat) {
+        printf("Setting output format to: %s\n", outputFormat);
         gtk_entry_set_text(GTK_ENTRY(outputFormatEntry), outputFormat);
     }
 }
@@ -124,14 +158,20 @@ static void repopulateDialog() {
 /**
  * Actually create the config window of the application
  * @param config The configuration object to show and manipulate
+ * @param sc The callback to call when the config is saved
+ * @param cc The callback to call when the config is cancelled
  */
-void ui_create_config_window(Config config) {
+void ui_create_config_window(Config config, SaveCallback sc, CancelCallback cc) {
     tearConfig = config;
+    saveCallback = sc;
+    cancelCallback = cc;
+
     createConfigWindow();
     createGrid();
     createBaseDirRow();
     createOutputFormatRow();
     createButtonsRow();
+    registerCallbacks();
 }
 
 /**

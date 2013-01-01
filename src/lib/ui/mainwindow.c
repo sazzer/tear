@@ -11,6 +11,9 @@ static const int DISC_ROW = 3;
 static const int FORMAT_ROW = 4;
 static const int BUTTONS_ROW = 5;
 
+/** The config callback to use */
+static ConfigCallback configCallback;
+
 /** The actual main window of the application */
 static GtkWidget* window;
 
@@ -143,8 +146,16 @@ static void createDriveRow() {
     gtk_combo_box_set_active(GTK_COMBO_BOX(driveEntry), 0);
 }
 
+static void onConfig() {
+    if (configCallback) {
+        configCallback();
+    }
+}
+
 /** The button to actually start ripping */
 static GtkWidget* goButton;
+/** The button to open the config dialog */
+static GtkWidget* configButton;
 /**
  * Create the buttons row
  */
@@ -156,14 +167,21 @@ static void createButtonsRow() {
     gtk_button_box_set_layout(GTK_BUTTON_BOX(buttonsBox), GTK_BUTTONBOX_END);
     gtk_widget_set_hexpand(buttonsBox, true);
 
+    configButton = gtk_button_new_with_label(_("Config"));
+    gtk_container_add(GTK_CONTAINER(buttonsBox), configButton);
+    g_signal_connect_swapped(G_OBJECT(configButton), "clicked", G_CALLBACK(onConfig), NULL);
+
     goButton = gtk_button_new_with_label(_("Go"));
     gtk_container_add(GTK_CONTAINER(buttonsBox), goButton);
 }
 
 /**
  * Actually create the main window of the application
+ * @param cc callback to trigger when the Config button is pressed
  */
-void ui_create_main_window() {
+void ui_create_main_window(ConfigCallback cc) {
+    configCallback = cc;
+
     createMainWindow();
     createGrid();
     createDriveRow();

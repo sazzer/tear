@@ -19,19 +19,66 @@ static const char * DEFAULT_FILENAME_OPTION = "%a/%t/%d.%e";
 /** The list of CD Drive Information */
 static CDList cdList;
 
+/** the config object */
+static Config config;
+
+/** Determination of whether we're configured or not */
+static bool wasConfigured;
 /**
  * Load the User Config object
  * @return the loaded config object, or NULL if one couldn't be loaded
  */
-Config loadUserConfig() {
+void loadUserConfig() {
     const char * userConfigDir = g_get_user_config_dir();
     char * configFile = g_build_filename(userConfigDir, CONFIG_FILENAME, NULL);
 
-    Config config = config_load(configFile);
+    config = config_load(configFile);
+
+    g_free(configFile);
+}
+
+/**
+ * Helper to show the initial window
+ */
+void showInitialWindow() {
+    if (wasConfigured) {
+        ui_show_main_window(true);
+        ui_show_config_window(false);
+    }
+    else {
+        ui_show_config_window(true);
+        ui_show_main_window(false);
+    }
+}
+
+/**
+ * Handler when the Save button is pressed on the config dialog
+ */
+void onConfigSave() {
+    const char * userConfigDir = g_get_user_config_dir();
+    char * configFile = g_build_filename(userConfigDir, CONFIG_FILENAME, NULL);
+
+    config_save(config, configFile);
 
     g_free(configFile);
 
-    return config;
+    wasConfigured = true;
+    showInitialWindow();
+}
+
+/**
+ * Handler when the Cancel button is pressed on the config dialog
+ */
+void onConfigCancel() {
+    showInitialWindow();
+}
+
+/**
+ * Handler when the Config button is pressed on the main window
+ */
+void onConfigClicked() {
+    ui_show_config_window(true);
+    ui_show_main_window(false);
 }
 
 /**
@@ -43,10 +90,10 @@ Config loadUserConfig() {
 int tear_main(int argc, char** argv, char** argp) {
     gtk_init(&argc, &argv);
     
-    bool hadConfig = true;
-    Config config = loadUserConfig();
+    wasConfigured = true;
+    loadUserConfig();
     if (config == NULL) {
-        hadConfig = false;
+        wasConfigured = false;
         config = config_new();
         config_set_string(config, BASE_DIR_SETTING, g_get_user_special_dir(G_USER_DIRECTORY_MUSIC));
         config_set_string(config, FILENAME_SETTING, DEFAULT_FILENAME_OPTION);
@@ -65,16 +112,10 @@ int tear_main(int argc, char** argv, char** argp) {
         printf("Found CD Drive %d: %s\n", i, name);
     }
 
-    ui_create_main_window();
-    ui_create_config_window(config);
-    if (hadConfig) {
-        ui_show_main_window(true);
-        ui_show_config_window(false);
-    }
-    else {
-        ui_show_config_window(true);
-        ui_show_main_window(false);
-    }
+    ui_create_main_window(onConfigClicked);
+    ui_create_config_window(config, onConfigSave, onConfigCancel);
+
+    showInitialWindow();
 
     gtk_main();
 

@@ -1,6 +1,5 @@
 #include <string.h>
 #include <ctype.h>
-#include "config.h"
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -9,6 +8,7 @@
 #include <glib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include "config.h"
 
 static const char EQUALS = '=';
 static const char COMMENT = '#';
@@ -45,7 +45,7 @@ Config config_load(const char * file) {
 
         while (fgets(lineBuffer, 1024, fb) != NULL) {
             lineBuffer[strlen(lineBuffer) - 1] = 0;
-            g_log("tear.config.load", G_LOG_LEVEL_DEBUG, "Read line: %s", lineBuffer);
+            g_log(NULL, G_LOG_LEVEL_DEBUG, "Read line: %s", lineBuffer);
             char * key;
             char * value;
             int keyEnd = -1;
@@ -57,7 +57,7 @@ Config config_load(const char * file) {
                 if (lineBuffer[valueEnd] == COMMENT) {
                     finished = true;
                     if (keyEnd == -1 && valueEnd != 0) {
-                        g_log("tear.config.load", G_LOG_LEVEL_WARNING, "Malformed line: %s", lineBuffer);
+                        g_log(NULL, G_LOG_LEVEL_WARNING, "Malformed line: %s", lineBuffer);
                     }
                     else {
                         --valueEnd;
@@ -70,7 +70,7 @@ Config config_load(const char * file) {
             }
 
             if (valueStart != -1) {
-                g_log("tear.config.load", G_LOG_LEVEL_DEBUG, "keyStart = 0(%c), keyEnd = %d(%c), valueStart = %d(%c), valueEnd = %d(%c)", 
+                g_log(NULL, G_LOG_LEVEL_DEBUG, "keyStart = 0(%c), keyEnd = %d(%c), valueStart = %d(%c), valueEnd = %d(%c)", 
                     lineBuffer[0], 
                     keyEnd, lineBuffer[keyEnd], 
                     valueStart, lineBuffer[valueStart],
@@ -78,7 +78,7 @@ Config config_load(const char * file) {
                 for (; keyEnd > 0 && isspace(lineBuffer[keyEnd - 1]); --keyEnd);
                 for (; valueStart < valueEnd && isspace(lineBuffer[valueStart]); ++valueStart);
                 for (; valueEnd > valueStart && isspace(lineBuffer[valueEnd - 1]); --valueEnd);
-                g_log("tear.config.load", G_LOG_LEVEL_DEBUG, "keyStart = 0(%c), keyEnd = %d(%c), valueStart = %d(%c), valueEnd = %d(%c)", 
+                g_log(NULL, G_LOG_LEVEL_DEBUG, "keyStart = 0(%c), keyEnd = %d(%c), valueStart = %d(%c), valueEnd = %d(%c)", 
                     lineBuffer[0], 
                     keyEnd, lineBuffer[keyEnd], 
                     valueStart, lineBuffer[valueStart],
@@ -87,12 +87,12 @@ Config config_load(const char * file) {
                 key = malloc(sizeof(char) * keyEnd);
                 strncpy(key, lineBuffer, keyEnd);
                 key[keyEnd] = 0;
-                g_log("tear.config.load", G_LOG_LEVEL_DEBUG, "Found key: '%s'", key);
+                g_log(NULL, G_LOG_LEVEL_DEBUG, "Found key: '%s'", key);
 
                 value = malloc(sizeof(char) * (valueEnd - valueStart));
                 strncpy(value, lineBuffer + valueStart, valueEnd - valueStart);
                 value[valueEnd - valueStart] = 0;
-                g_log("tear.config.load", G_LOG_LEVEL_DEBUG, "Found value: '%s'", value);
+                g_log(NULL, G_LOG_LEVEL_DEBUG, "Found value: '%s'", value);
 
                 g_hash_table_insert(result->values, key, value);
             }
@@ -102,7 +102,7 @@ Config config_load(const char * file) {
         fclose(fb);
     }
     else {
-        g_log("tear.config.load", G_LOG_LEVEL_WARNING, "Unable to open config file %s: %s", file, strerror(errno));
+        g_log(NULL, G_LOG_LEVEL_WARNING, "Unable to open config file %s: %s", file, strerror(errno));
     }
     return result;
 }
@@ -119,6 +119,36 @@ void config_free(Config* config) {
     }
 }
 
+static void writeConfigRow(gpointer pkey, gpointer pvalue, gpointer pfd) {
+    FILE* fd = *((FILE**)pfd);
+    const char* key = (const char*)pkey;
+    const char* value = (const char*)pvalue;
+    int size = snprintf(0, 0, "%s=%s\n", key, value) + 1; 
+    char * line = malloc(sizeof(char) * size);
+    snprintf(line, size, "%s=%s\n", key, value);
+    g_log(NULL, G_LOG_LEVEL_DEBUG, "Writing line: %s", line);
+    fwrite(line, strlen(line), sizeof(char), fd);
+    free(line);
+}
+
+/**
+ * Save the contents of the provided Config object to a file
+ * @param config The config file to save
+ * @param file the file to write to
+ * @return true on success, false on failure
+ * TODO: Actual error handling!
+ */
+bool config_save(const Config config, const char * file) {
+    bool result = false;
+    if (config) {
+        FILE* fd = fopen(file, "w");
+        g_hash_table_foreach(config->values, writeConfigRow, &fd);
+        fclose(fd);
+        result = true;
+    }
+    return result;
+}
+
 /**
  * Get the requested setting from the Config object, as a String. If the setting isn't
  * present then NULL is returned instead
@@ -126,7 +156,7 @@ void config_free(Config* config) {
  * @param name The name of the setting to get
  * @return the setting, or NULL if not present
  */
-const char * config_get_string(Config config, const char * name) {
+const char * config_get_string(const Config config, const char * name) {
     const char * val = 0;
     if (config) {
         val = g_hash_table_lookup(config->values, name);
