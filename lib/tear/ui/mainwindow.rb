@@ -58,7 +58,7 @@ module Tear
                     drive = @drives[driveIndex]
                     author = @authorEntry.text
                     title = @titleEntry.text
-                    disc = Integer(@discEntry.value)
+                    disc = Integer(@discEntry.value).to_s.rjust(2, '0')
                     formatIndex = @formatEntry.active
                     format = @formats[formatIndex]
 
