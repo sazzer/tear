@@ -28,7 +28,7 @@ module Tear
                             line.scan(/^##: ([0-9-]+).*@ (\d+)/).collect { |func, offset|
                                 sector = Integer(offset) / CD_FRAMEWORDS
                                 track = @cdinfo.track_from_sector sector
-                                percentage = (Float(sector) / @cdinfo.total_sectors) * 100;
+                                percentage = (Float(sector) / @cdinfo.total_sectors);
                                 if (func == FUNCTION_READ)
                                     events.fire(:read_progress, {:sector => sector, :track => track, :percentage => percentage})
                                 elsif (func == FUNCTION_WRITE)
@@ -39,6 +39,8 @@ module Tear
                     rescue EOFError
                         $log.info "Finished ripping from drive #{@drive}"
                         events.fire(:finished)
+                    rescue => e
+                        $log.error "Oops #{e}"
                     end
                 end
             end

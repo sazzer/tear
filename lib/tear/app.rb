@@ -2,6 +2,7 @@ require "tear/version"
 require "tear/logger"
 require "tear/ui/config"
 require "tear/ui/mainwindow"
+require "tear/ui/progress"
 require "tear/config"
 require "tear/formats"
 require "tear/drives"
@@ -19,10 +20,10 @@ module Tear
             Gtk.init
             @mainWindow = Tear::UI::MainWindow.new
             @configWindow = Tear::UI::Config.new config
+            @progressWindow = Tear::UI::Progress.new config
 
             @mainWindow.set_formats @formats
             @mainWindow.set_drives @drives
-
 
             @mainWindow.events.listen(:closed) do
                 Gtk.main_quit
@@ -34,6 +35,13 @@ module Tear
             @mainWindow.events.listen(:go) do
                 |e|
                 $log.info "About to rip: #{e}"
+                @progressWindow.author=e[:author]
+                @progressWindow.title=e[:title]
+                @progressWindow.disc=e[:disc]
+                @progressWindow.drive=e[:drive]
+                @progressWindow.format=e[:format]
+                @mainWindow.hide
+                @progressWindow.start
             end
             @configWindow.events.listen(:save) do 
                 config.save
