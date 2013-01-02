@@ -16,7 +16,7 @@ module Tear
                 $log.info "Encoding source #{source} to #{target}"
                 FileUtils.mkdir_p File.dirname(target)
 
-                Open3.popen3("lame --ta \"#{author}\" --tt \"#{title}\" --tl \"#{title}\" --tn \"#{disc}\" --add-id3v2 \"#{source}\" \"#{target}\"") do
+                Open3.popen3("lame --ta \"#{author}\" --tt \"#{title} Disc #{disc}\" --tl \"#{title}\" --tn \"#{disc}\" --add-id3v2 \"#{source}\" \"#{target}\"") do
                     |stdin, stdout, stderr|
 
                     $log.info "Here we go"
