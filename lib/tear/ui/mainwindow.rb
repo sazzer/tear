@@ -38,8 +38,37 @@ module Tear
                 @formatEntry.add_attribute cellRenderer, "text", 1
                 addLabelledWidget("Format", @formatEntry, 4)
 
+                buttonsBox = Gtk::HButtonBox.new
+                @grid.attach(buttonsBox, 0, 2, 5, 6)
+                @goButton = Gtk::Button.new("Go")
+                @configButton = Gtk::Button.new("Config")
+                buttonsBox.add @goButton
+                buttonsBox.add @configButton
+
                 @window.signal_connect("destroy") { |dialog, response|
                     events.fire(:closed)
+                }
+
+                @configButton.signal_connect("clicked") {
+                    events.fire(:config)
+                }
+
+                @goButton.signal_connect("clicked") {
+                    driveIndex = @driveEntry.active
+                    drive = @drives[driveIndex]
+                    author = @authorEntry.text
+                    title = @titleEntry.text
+                    disc = Integer(@discEntry.value)
+                    formatIndex = @formatEntry.active
+                    format = @formats[formatIndex]
+
+                    if title.empty?
+                        $log.warn "No title entered"
+                    elsif author.empty?
+                        $log.warn "No author entered"
+                    else
+                        events.fire(:go, {:drive => drive, :author => author, :title => title, :disc => disc, :format => format})
+                    end
                 }
             end
 
@@ -67,6 +96,9 @@ module Tear
 
             def show
                 @window.show_all
+            end
+            def hide
+                @window.hide
             end
 
             private

@@ -18,13 +18,23 @@ module Tear
 
             Gtk.init
             @mainWindow = Tear::UI::MainWindow.new
+            @configWindow = Tear::UI::Config.new config
+
             @mainWindow.set_formats @formats
             @mainWindow.set_drives @drives
+
+
             @mainWindow.events.listen(:closed) do
                 Gtk.main_quit
             end
-
-            @configWindow = Tear::UI::Config.new config
+            @mainWindow.events.listen(:config) do
+                @mainWindow.hide
+                @configWindow.show
+            end
+            @mainWindow.events.listen(:go) do
+                |e|
+                $log.info "About to rip: #{e}"
+            end
             @configWindow.events.listen(:save) do 
                 config.save
                 @mainWindow.show
