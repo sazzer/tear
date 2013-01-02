@@ -8,7 +8,7 @@ module Tear
         end
 
         class Cdinfo
-            attr_accessor :tracks
+            attr_accessor :tracks, :total_sectors
 
             def initialize(drive)
                 stdin, stdout, stderr = Open3.popen3("cdparanoia -d #{drive} -Q -e")
@@ -30,6 +30,13 @@ module Tear
                         @tracks.push track
                         $log.info "Found track #{track.track} of length #{track.length}, ranging from #{track.track_start} to #{track.track_end}"
                     }
+                }
+                @total_sectors = total
+            end
+
+            def track_from_sector(sector)
+                @tracks.find { |track|
+                    track.track_start <= sector && track.track_end >= sector
                 }
             end
         end
