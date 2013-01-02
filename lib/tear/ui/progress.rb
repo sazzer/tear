@@ -3,6 +3,7 @@ require "ruby_events"
 require "tempfile"
 require "tear/logger"
 require "tear/cdparanoia/cdripper"
+require "tear/filename"
 
 module Tear 
     module UI
@@ -39,6 +40,8 @@ module Tear
 
             def start
                 @window.show_all
+                filename = Filename.new(@config, @title, @author, @disc, @format).build_filename
+
                 startTime = Time.now
 
                 tempfile = Tempfile.new(["tear", ".wav"])
@@ -56,7 +59,21 @@ module Tear
                     updateTimer startTime
                 end
                 cdripper.events.listen(:finished) do
-                    tempfile.unlink
+                    @format.events.listen(:progress) do |e|
+                        @encodeProgress.fraction = e[:percentage]
+                        updateTimer startTime
+                    end
+
+                    @format.events.listen(:finished) do
+                        $log.info "Finished encoding"
+                        tempfile.unlink
+                        @window.hide
+                        events.fire(:finished)
+                    end
+
+                    $log.info "Encoding to #{filename} with #{@format}"
+                    @progressLabel.text = "Encoding file"
+                    @format.encode tempfile.path, filename, @title, @author, @disc
                 end
                 @progressLabel.text = "About to rip #{cdripper.cdinfo.tracks.size} tracks"
                 thread = Thread.new {

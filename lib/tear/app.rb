@@ -54,6 +54,9 @@ module Tear
                     @mainWindow.show
                 end
             end
+            @progressWindow.events.listen(:finished) do
+                @mainWindow.show
+            end
 
             if !config.loaded
                 @configWindow.show
