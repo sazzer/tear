@@ -4,7 +4,7 @@ require "tear/formats/wav"
 module Tear
     module Formats
         def self.formats
-            [WAV.new]
+            [MP3.new, WAV.new]
         end
     end
 end

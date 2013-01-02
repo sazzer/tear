@@ -1,4 +1,4 @@
-require "pty"
+require "open3"
 require "tear/logger"
 require "tear/cdparanoia/cdinfo"
 require "ruby_events"
